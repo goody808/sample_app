@@ -13,7 +13,7 @@ require 'spec_helper'
 
 describe User do
   before { @user = User.new(name:"Example User", email: "example@user.com",
-  													password: "foo", password_confirmation: "foo") }
+  													password: "foobar", password_confirmation: "foobar") }
 
   subject { @user }
 
@@ -65,13 +65,13 @@ describe User do
 
 	describe "email is a duplicate" do 
 		before do 
-			user_same_email = @user.dup
+			user_same_email = @user.dup 
 			user_same_email.save
 		end
 		it { should_not be_valid }
 	end
 #Password test section 
-	describe "password is blank" do 
+	describe "password is not valid when blannk" do 
 		before { @user.password = @user.password_confirmation = " " } 
 		it { should_not be_valid }
 	end
@@ -82,16 +82,21 @@ describe User do
 	end
 
 	describe "when password is nill" do 
-		before { @user.password_confirmation = nill }
+		before { @user.password_confirmation = nil }
 		it { should_not be_valid }
 	end
+
+	describe "when password is too short" do 
+		before { @user.password = @user.password_confirmation = 'a' * 5 }
+		it { should_not be_valid }
+  end
 
 	describe "return value of authenticate method" do 
 		before { @user.save }
 		let(:found_user) { User.find_by_email(@user.email) }
 
 		describe "with valide password" do 
-			it { should = found_user.authenticate(@user.password) }
+			it { should == found_user.authenticate(@user.password) }
 		end 
 
 		describe "with invalid password" do 
@@ -101,9 +106,5 @@ describe User do
 			specify { user_with_invalid_password.should be_false }
 		end
 	end
-
-	describe "when password is too short" do 
-		before { @user.password = @user.password_confirmation = 'a ' * 5 }
-		it { should_not be_valid }
-	end 
+ 
 end
